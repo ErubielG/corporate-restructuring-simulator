@@ -24,3 +24,21 @@ All `.py` modules under `v3sim` are copied from the internal V3.2.1-I03 prototyp
 ## CI
 
 The GitHub Actions workflow runs the **public** test suite and generates a synthetic cohort without access to the internal Atlas. The original research's 87-test suite is not reproduced by the public CI workflow and should not be represented as such.
+
+## Public data-science workflow
+
+The standalone demo is generated using the commands in the root `README.md`.
+The two notebooks consume **already generated** CSV output rather than
+fetching external information or running expensive model builds implicitly.
+That separation keeps the analytical workflow inspectable:
+
+1. Start from a checked-in JSON configuration with fixed seed.
+2. Generate a SQLite **schema-only** fixture with zero records.
+3. Run the original DES engine and export per-company CSV + manifest.
+4. Run sensitivity experiments with 4 duration multipliers x 4 seeds.
+5. Use Pandas for grouped summaries, diagnostic plots and correlations.
+6. Interpret seed-to-seed ranges as conditional numerical variation only.
+
+The figures committed under `figures/` are examples for those exact default
+synthetic commands. Regenerate them after changing code or assumptions.
+No stochastic claim about real firms follows from these notebooks.

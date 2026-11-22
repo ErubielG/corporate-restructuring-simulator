@@ -1,8 +1,11 @@
-name: Test public synthetic simulator
+name: Synthetic demo tests
 
 on:
   push:
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -15,14 +18,33 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Run dependency-free unit tests
+      - name: Run public standalone unit tests
         run: python -m unittest discover -s tests -v
-      - name: Execute synthetic example
+      - name: Generate synthetic data and provenance
         run: |
           python scripts/make_synthetic_fixture.py --out data/synthetic_demo_fixture.sqlite
-          python -m v3sim.dynamic_cli --config config_demo_synthetic.json --atlas data/synthetic_demo_fixture.sqlite --out output/ci_demo --trace-limit 2
-          python scripts/analyze_demo.py --input output/ci_demo/empresas_resultados.csv --out output/ci_demo/category_summary.csv
-          python -m scripts.run_sensitivity --config config_demo_synthetic.json --n 25 --scales 0.8 1.0 1.4 --seeds 100 101 --out output/ci_sensitivity.csv
-      - name: Check output files
+          python -m v3sim.dynamic_cli --config config_demo_synthetic.json --atlas data/synthetic_demo_fixture.sqlite --out output/demo --trace-limit 3
+          python scripts/analyze_demo.py --input output/demo/empresas_resultados.csv --out output/demo/category_summary.csv
+      - name: Run sensitivity analysis
         run: |
-          python -c "from pathlib import Path; assert Path('output/ci_demo/empresas_resultados.csv').is_file(); assert Path('output/ci_sensitivity.csv').is_file()"
+          python -m v3sim.dynamic_analysis --config config_demo_synthetic.json --atlas data/synthetic_demo_fixture.sqlite --out output/sensitivity --scales 0.8 1.0 1.3 1.7 --seeds 20261012 20261013 20261014 20261015
+
+  visualizations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install optional plotting dependencies
+        run: python -m pip install 'pandas>=2.0,<3.0' 'matplotlib>=3.7,<4.0'
+      - name: Generate synthetic demo and sensitivity plots
+        run: |
+          python scripts/make_synthetic_fixture.py --out data/synthetic_demo_fixture.sqlite
+          python -m v3sim.dynamic_cli --config config_demo_synthetic.json --atlas data/synthetic_demo_fixture.sqlite --out output/demo --trace-limit 0
+          python -m v3sim.dynamic_analysis --config config_demo_synthetic.json --atlas data/synthetic_demo_fixture.sqlite --out output/sensitivity --scales 0.8 1.0 1.3 1.7 --seeds 20261012 20261013 20261014 20261015
+          python scripts/plot_results.py --companies output/demo/empresas_resultados.csv --sensitivity output/sensitivity/barrido_v32.csv --out output/figures
+      - uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-analysis-figures
+          path: output/figures/

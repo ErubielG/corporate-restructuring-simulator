@@ -1,18 +1,9 @@
-[build-system]
-requires = ["setuptools>=64"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "corporate-restructuring-des"
 version = "0.3.2"
 description = "Reproducible discrete-event simulation of hypothetical corporate restructuring pathways"
-readme = "README.md"
 requires-python = ">=3.10"
-license = {file = "LICENSE"}
 dependencies = []
-
-[project.optional-dependencies]
-analysis = ["pandas>=2,<3", "matplotlib>=3.8,<4", "jupyterlab>=4,<5"]
 
 [tool.setuptools.packages.find]
 include = ["v3sim*"]
