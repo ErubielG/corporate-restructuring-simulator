@@ -1,18 +1,21 @@
+# Python
 __pycache__/
 *.py[cod]
 .venv/
 venv/
 .env
 .pytest_cache/
-.ipynb_checkpoints/
 .DS_Store
-output/
-data/
+*.egg-info/
+# Generated simulation outputs (the intentionally selected examples/ and figures/ stay tracked)
+/output/
+/data/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
 *.db
-*.xlsx
-*.pdf
-/evidencia/
+# Local notebooks
+.ipynb_checkpoints/
+# Research archive: never add unreviewed historical evidence here
 /private/
+/evidencia/
