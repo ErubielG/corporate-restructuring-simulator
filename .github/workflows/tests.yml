@@ -1,0 +1,28 @@
+name: Test public synthetic simulator
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run dependency-free unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Execute synthetic example
+        run: |
+          python scripts/make_synthetic_fixture.py --out data/synthetic_demo_fixture.sqlite
+          python -m v3sim.dynamic_cli --config config_demo_synthetic.json --atlas data/synthetic_demo_fixture.sqlite --out output/ci_demo --trace-limit 2
+          python scripts/analyze_demo.py --input output/ci_demo/empresas_resultados.csv --out output/ci_demo/category_summary.csv
+          python -m scripts.run_sensitivity --config config_demo_synthetic.json --n 25 --scales 0.8 1.0 1.4 --seeds 100 101 --out output/ci_sensitivity.csv
+      - name: Check output files
+        run: |
+          python -c "from pathlib import Path; assert Path('output/ci_demo/empresas_resultados.csv').is_file(); assert Path('output/ci_sensitivity.csv').is_file()"

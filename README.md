@@ -1,105 +1,141 @@
 # Corporate Restructuring Simulator
 
-### Discrete-Event Simulation | Data Analysis | Monte Carlo Methods | Python
+**Python · Discrete-event simulation · Monte Carlo · SQLite · Data analysis**
 
-## Overview
+A reproducible experimental simulator of hypothetical corporate restructuring timelines.
+The model distinguishes **legal control transfer** from **operational independence**, while
+representing dependencies and events such as regulatory delays, buyer withdrawal, technical
+failures, and transitional services.
 
-Corporate Restructuring Simulator is a Python-based computational project designed to study the uncertainty, complexity, and duration of corporate restructuring processes.
+> **Research integrity:** Public scenarios contain **only synthetic companies and hypothetical
+> parameters**. Simulated time-to-autonomy and rates are *not* validated forecasts, observed
+> legal compliance rates, or evidence that a particular economic policy would work.
 
-The project uses **discrete-event simulation and Monte Carlo methods** to model how regulatory procedures, operational dependencies, legal appeals, and unexpected disruptions can influence restructuring timelines.
+## What the project demonstrates
 
-Rather than assuming that corporate restructuring follows a fixed schedule, the simulator models different events and evaluates how they affect the progress and outcomes of simulated companies.
+- **Simulation engineering:** a dynamic discrete-event engine built with `heapq`,
+  explicit task dependencies and a traceable event log.
+- **Stochastic methods:** synthetic Monte Carlo cohorts, fixed seeds, uncertainty and
+  parameter-sensitivity experiments.
+- **Data engineering:** optional SQLite adapter, JSON configuration, CSV exports and
+  SHA-256 provenance checks.
+- **Data science:** reproducible exploratory analysis and visualizations of *synthetic*
+  outputs, including variability across repeated runs.
+- **Software quality:** unit tests and GitHub Actions on Python 3.10 and 3.12.
 
-The project is also a practical exploration of **data science, statistical analysis, simulation engineering, and predictive modeling**.
+## Quick start
 
-## Objectives
+Python 3.10+ is required. The core simulator and unit tests use the Python standard library.
+Run from the repository root:
 
-The main objectives are to:
+```bash
+python -m unittest discover -s tests -v
+python scripts/make_synthetic_fixture.py --out data/synthetic_demo_fixture.sqlite
+python -m v3sim.dynamic_cli --config config_demo_synthetic.json --atlas data/synthetic_demo_fixture.sqlite --out output/demo --trace-limit 5
+python scripts/analyze_demo.py --input output/demo/empresas_resultados.csv --out output/demo/category_summary.csv
+```
 
-- Develop reproducible computational simulations of corporate restructuring.
-- Model legal, technical, and operational dependencies.
-- Analyze the effects of delays and unexpected events.
-- Study uncertainty through Monte Carlo experiments.
-- Explore relationships between organizational complexity and restructuring timelines.
-- Evaluate different assumptions through sensitivity analysis.
-- Investigate the limitations of simulation-based predictions.
+The generated SQLite file is **empty by design**: it provides a compatible schema and
+provenance interface but contains zero historical business cases or observed sale durations.
+It is not the private research Atlas.
 
-## Simulation Model
+### Optional data-analysis tools
 
-The simulation engine is based on a discrete-event architecture developed through multiple iterations, including versions 3.2 and 3.2.1-I03.
+```bash
+python -m pip install -e ".[analysis]"
+python -m scripts.run_sensitivity --config config_demo_synthetic.json --out output/sensitivity/sensitivity.csv
+python -m scripts.plot_synthetic --companies output/demo/empresas_resultados.csv --sensitivity output/sensitivity/sensitivity.csv --out figures
+jupyter lab
+```
 
-The model can represent events such as:
+See `notebooks/01_exploratory_analysis.ipynb` and
+`notebooks/02_monte_carlo_sensitivity.ipynb` for guided exercises.
 
-- Regulatory approvals and legal appeals.
-- Buyer withdrawal and replacement.
-- Operational separation and technical dependencies.
-- Transitional service agreements.
-- Technical failures and certification delays.
-- Partial transfers and alternative remedies.
-- Unfinished restructuring processes.
+### Visual results (synthetic only)
 
-By introducing uncertainty into these processes, the model generates different outcomes for analysis.
+**Distribution of simulated operational-independence times**
 
-## Technologies
+![Synthetic distribution](figures/duration_distribution.png)
 
-| Technology | Application |
+**Sensitivity across configured random seeds — NOT a confidence interval**
+
+![Synthetic sensitivity](figures/sensitivity_across_seeds.png)
+
+These visualizations are generated from the provided baseline config. They reflect model
+assumptions and must not be interpreted as measured outcomes for real companies.
+
+## Architecture
+
+```text
+config_demo_synthetic.json
+      │
+      ▼
+ v3sim.dynamic_cli ─── SQLite fixture (no historical records)
+      │
+      ▼
+ v3sim.dynamic_engine
+      ├── task dependency graph
+      ├── priority event queue and rescheduling
+      ├── hypothetical incidents and outcomes
+      └── causal event traces
+      │
+      ▼
+ CSV outcomes + JSON traces + SHA-256 provenance
+      │
+      ▼
+ notebooks / sensitivity experiments / figures
+```
+
+`v3sim/` contains the **original 16 Python modules** from the V3.2.1-I03 experimental
+research package. The `scripts/`, `notebooks/` and `tests/` material provide the public,
+synthetic-only analysis layer. Core simulation rules were not modified for this release.
+
+## Where to look first
+
+| Folder / file | Purpose |
 |---|---|
-| Python | Simulation engine and computational logic |
-| SQLite | Structured data storage |
-| JSON | Scenario configuration |
-| CSV | Simulation results and data exchange |
-| Monte Carlo Methods | Uncertainty and scenario analysis |
-| Discrete-Event Simulation | Event scheduling and process modeling |
+| `v3sim/dynamic_engine.py` | Dynamic event scheduling and state changes |
+| `v3sim/engine.py` | Synthetic entity and stage duration generation |
+| `v3sim/dynamic_config.py` | Configuration validation and parameter mapping |
+| `scripts/make_synthetic_fixture.py` | Empty SQLite interface for public execution |
+| `scripts/run_sensitivity.py` | Parameter sweeps with repeated synthetic seeds |
+| `scripts/plot_synthetic.py` | Reproducible figures |
+| `tests/` | Tests runnable without the private Atlas |
+| `docs/MATHEMATICAL_MODEL.md` | Model assumptions, formulas and engineering decisions |
+| `docs/LIMITATIONS.md` | Explicit empirical and legal limitations |
 
-Additional data analysis and visualization tools will be integrated as the public repository develops.
+## Reproducibility and tests
 
-## Research Background
+All stochastic experiments use configurable fixed seeds. A fresh clone can reproduce the
+demo without external data access. The public automated tests are **self-contained**.
+The private research package has an additional Atlas-dependent test suite that is **not**
+shipped here; no claim is made that CI validates the private corpus.
 
-This project originated as part of *Sistemas y Sociedad*, an independent interdisciplinary research initiative exploring economic concentration, corporate control, institutional oversight, and market regulation.
+## Research origin and limits
 
-The broader research includes a documentary atlas of 63 historical restructuring and divestiture cases.
+This is a portfolio-oriented derivative of **Sistemas y Sociedad**, an independent
+interdisciplinary investigation of economic concentration, institutional oversight and
+restructuring procedures. The broader offline documentary Atlas contains 63 case records,
+mainly from UK competition proceedings; those records are intentionally not published here.
+They do **not** provide sufficiently validated sale-to-full-autonomy time pairs for
+calibrating the public operating timelines.
 
-However, the simulation engine is maintained as a separate computational project.
+The system does **not** estimate real-world probabilities of successful separation, or
+model market equilibrium, prices, employment, innovation or social welfare.
+The research questions and verification criteria were human-directed, with AI-assisted
+implementation, code review and documentation. See `docs/LIMITATIONS.md` for details.
 
-Its purpose is to explore restructuring processes and develop technical skills in simulation, programming, and data analysis.
+## Future work
 
-## Current Status
-
-**Experimental project — public repository under development.**
-
-The underlying simulation engine has undergone several iterations and automated testing.
-
-The public version is being reorganized for reproducibility, documentation, and independent execution.
-
-Future development will include exploratory data analysis, visualization, additional sensitivity experiments, and predictive modeling exercises.
-
-## Limitations
-
-This project is primarily an experimental simulation framework.
-
-Simulated outcomes depend on assumptions regarding event probabilities, process durations, organizational characteristics, and operational dependencies.
-
-**Synthetic results should not be interpreted as validated predictions of real corporate restructuring outcomes.**
-
-The available historical research is not sufficient to establish reliable general-purpose predictions of operational independence or restructuring success.
-
-Any predictive models developed from synthetic outputs must be evaluated separately from models trained and validated on real-world observations.
-
-## Roadmap
-
-- [ ] Organize and document the public simulation engine.
-- [ ] Provide reproducible example scenarios.
-- [ ] Add exploratory data analysis notebooks.
-- [ ] Visualize simulated duration distributions.
-- [ ] Perform sensitivity and uncertainty analysis.
-- [ ] Introduce and evaluate predictive modeling techniques.
-- [ ] Document testing procedures and methodological limitations.
-- [ ] Add automated testing through GitHub Actions.
+- [x] Publish the original engine and reproducible synthetic demo.
+- [x] Add standalone tests and CI.
+- [x] Add visual exploratory analysis and sensitivity experiments.
+- [x] Document mathematical assumptions and provenance limitations.
+- [ ] Add diagnostic stress tests for very long-tail and concurrent events.
+- [ ] Improve statistical evaluation and input-data provenance.
+- [ ] Study predictive modeling only after defining a justified validation design.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
----
-
-*This repository is intended for educational, computational, and exploratory research purposes.*
+MIT License. See [`LICENSE`](LICENSE). The private Atlas and third-party source documents
+are **not included** and are **not licensed** by this repository.

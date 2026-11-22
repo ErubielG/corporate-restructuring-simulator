@@ -1,0 +1,26 @@
+{
+  "interpretation": "synthetic-only portfolio example; NOT a validated forecast",
+  "cohort": 250,
+  "seed": 20261012,
+  "category_summary": [
+    {
+      "category": "I",
+      "companies_synthetic": "47",
+      "autonomy_by_maximum_simulated_rate": "0.2766",
+      "autonomy_median_months_simulated": "20.707"
+    },
+    {
+      "category": "II",
+      "companies_synthetic": "161",
+      "autonomy_by_maximum_simulated_rate": "0.9627",
+      "autonomy_median_months_simulated": "20.568"
+    },
+    {
+      "category": "III",
+      "companies_synthetic": "42",
+      "autonomy_by_maximum_simulated_rate": "1.0",
+      "autonomy_median_months_simulated": "26.189"
+    }
+  ],
+  "aggregate_autonomy_by_assumed_maximum": 0.84
+}

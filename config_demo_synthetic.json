@@ -1,0 +1,226 @@
+{
+  "schema_version": "V3_2_experimental",
+  "evidence_mode": "synthetic_only",
+  "population": {
+    "n": 250,
+    "seed": 20261012,
+    "sector_weights": {
+      "Manufactura": 0.14285714285714285,
+      "Servicios": 0.14285714285714285,
+      "Comercio": 0.14285714285714285,
+      "Transporte": 0.14285714285714285,
+      "Electricidad/agua/telecom": 0.14285714285714285,
+      "Construccion": 0.14285714285714285,
+      "Salud": 0.14285714285714285
+    }
+  },
+  "policy": {
+    "score_weights": {
+      "technical": 0.34,
+      "dependencies": 0.24,
+      "labor": 0.22,
+      "service_continuity": 0.2
+    },
+    "score_thresholds": [
+      35,
+      65
+    ],
+    "critical_min_category": "II",
+    "critical_service_threshold": 85,
+    "critical_labor_threshold": 85,
+    "critical_dependency_threshold": 65,
+    "critical_service_sectors": [
+      "Electricidad/agua/telecom",
+      "Salud"
+    ],
+    "hypothetical_urgent_harm_probability": 0.02,
+    "global_maximum_months": 60,
+    "categories": {
+      "I": {
+        "initial_months": 12,
+        "max_months": 18
+      },
+      "II": {
+        "initial_months": 30,
+        "max_months": 36
+      },
+      "III": {
+        "initial_months": 48,
+        "max_months": 60
+      }
+    }
+  },
+  "behavior": {
+    "appeal_probability": 0.15,
+    "appeal_extra_months": [
+      1.0,
+      4.0
+    ],
+    "delay_probability": 0.18,
+    "delay_months": [
+      1.0,
+      7.0
+    ]
+  },
+  "technical_sector_multiplier": {
+    "Manufactura": 1.3,
+    "Servicios": 1.0,
+    "Comercio": 0.8,
+    "Transporte": 1.2,
+    "Electricidad/agua/telecom": 1.5,
+    "Construccion": 1.1,
+    "Salud": 1.4
+  },
+  "stage_durations": {
+    "plan": [
+      0.5,
+      1.0,
+      2.0
+    ],
+    "buyer_search": [
+      2.0,
+      5.0,
+      12.0
+    ],
+    "authority_review": [
+      1.0,
+      2.0,
+      5.0
+    ],
+    "legal_transfer": [
+      0.2,
+      0.5,
+      1.5
+    ],
+    "tech_preparation": [
+      1.0,
+      4.0,
+      12.0
+    ],
+    "staff_preparation": [
+      0.5,
+      1.5,
+      6.0
+    ],
+    "infrastructure_preparation": [
+      1.0,
+      3.0,
+      11.0
+    ],
+    "operational_cutover": [
+      0.5,
+      1.0,
+      3.0
+    ],
+    "transitional_services": [
+      0.0,
+      4.0,
+      18.0
+    ],
+    "verification": [
+      0.2,
+      1.0,
+      4.0
+    ]
+  },
+  "operational_disruption": {
+    "probability": 0.12,
+    "extra_months": [
+      1.0,
+      5.0
+    ],
+    "target_stage": "operational_cutover"
+  },
+  "atlas_sale_stage_weights": {
+    "plan": 0.18,
+    "buyer_search": 0.49,
+    "authority_review": 0.25,
+    "legal_transfer": 0.08
+  },
+  "operational_scale": 1.0,
+  "complexity_duration": {
+    "strength": 0.7,
+    "max_effect": 0.6,
+    "stage_drivers": {
+      "tech_preparation": {
+        "technical": 1.0
+      },
+      "staff_preparation": {
+        "labor": 1.0
+      },
+      "infrastructure_preparation": {
+        "dependencies": 0.65,
+        "technical": 0.35
+      },
+      "operational_cutover": {
+        "technical": 0.35,
+        "dependencies": 0.35,
+        "labor": 0.15,
+        "service_continuity": 0.15
+      },
+      "transitional_services": {
+        "service_continuity": 0.55,
+        "dependencies": 0.45
+      },
+      "verification": {
+        "dependencies": 0.5,
+        "service_continuity": 0.5
+      }
+    }
+  },
+  "evaluation": {
+    "target_fraction": 0.6,
+    "primary_metric": "autonomy_by_maximum"
+  },
+  "transitional_services_scale": 1.0,
+  "sector_multiplier_scale": 1.0,
+  "dynamic_events": {
+    "allow_counterfactual_legal_on_atlas": false,
+    "legal_appeal": {
+      "probability": 0.15,
+      "duration_months": [
+        1.0,
+        4.0
+      ]
+    },
+    "regulatory_suspension": {
+      "probability": 0.05,
+      "duration_months": [
+        0.5,
+        2.0
+      ]
+    },
+    "buyer_withdrawal": {
+      "probability": 0.08,
+      "replacement_search_months": [
+        1.0,
+        5.0
+      ]
+    },
+    "remedy_revision": {
+      "probability": 0.08,
+      "redesign_months": [
+        1.0,
+        4.0
+      ],
+      "review_rework_months": [
+        0.5,
+        2.0
+      ]
+    },
+    "technical_failure": {
+      "probability": 0.15,
+      "repair_months": [
+        0.5,
+        2.5
+      ],
+      "rework_months": [
+        0.5,
+        2.5
+      ]
+    },
+    "commercial_supply_probability": 0.15,
+    "max_simulation_months": 240,
+    "max_events_per_company": 1000
+  }
+}
